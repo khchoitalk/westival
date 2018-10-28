@@ -1,0 +1,510 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mapper PUBLIC
+"-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="adminMapper">
+
+	<resultMap type="Admin" id="resultList">
+		<result property="user_id" column="user_id" />
+		<result property="name" column="name" />
+		<result property="ticket_no" column="ticket_no" />
+		<result property="ticket_date" column="ticket_date" />
+		<result property="ticket_count" column="ticket_count" />
+		<result property="price" column="price" />
+		<result property="pay_type" column="pay_type" />
+		<result property="state" column="state" />
+		<result property="user_name" column="user_name" />
+	
+	</resultMap>
+	
+	
+	<resultMap type="Festival" id="festivalList">
+		<result property="no" column="no" />
+		<result property="reg_user" column="reg_user" />
+		<result property="name" column="name" />
+		<result property="address" column="address" />
+		<result property="original_img_name" column="original_img_name" />
+		<result property="new_img_name" column="new_img_name" />
+		<result property="content" column="content" />
+		<result property="start_date" column="start_date" />
+		<result property="end_date" column="end_date" />
+		<result property="theme" column="theme" />
+		<result property="telephone" column="telephone" />
+		<result property="manage" column="manage" />
+		<result property="ticket" column="ticket" />
+		<result property="file_name" column="file_name" />
+		<result property="tag" column="tag" />
+		<result property="read_count" column="read_count" />
+		<result property="recommend" column="recommend" />
+										
+	
+	</resultMap>
+	
+	
+	<resultMap type="Member" id="memberList">
+		<result property="user_id" column="user_id" />
+		<result property="user_pwd" column="user_pwd" />
+		<result property="user_name" column="user_name" />
+		<result property="user_birth" column="user_birth" />
+		<result property="user_address" column="user_address" />
+		<result property="user_phone" column="user_phone" />
+		<result property="user_email" column="user_email" />
+		<result property="user_gender" column="user_gender" />
+		
+		
+										
+	
+	</resultMap>
+	
+	
+	<!-- 예매관리 (페이징) -->
+	<select id="ticketgetListCount" resultType="_int">
+	
+	select count(*) from v_festival_ticket_user
+		
+	</select>
+	
+	<!-- 예매관리 (리스트) -->
+	<select id="ticketSelectList" parameterType="AdminTicketPage" resultMap="resultList">
+	
+	select * from (
+				select ROWNUM RNUM, user_id, name, ticket_no, ticket_date, 
+				ticket_count, price, pay_type, state, user_name 
+				from (select * from v_festival_ticket_user 
+				order by ticket_date asc))
+				where RNUM between #{startRow} and #{endRow}
+	
+	</select>
+	
+	<!-- 예매관리(페이징) -->
+	<select id="tGetListCount" resultType="_int">
+	
+	select count(*) from v_festival_ticket_user
+	
+	</select>
+	<!-- 예매관리(리스트) -->
+	<select id="tAllSelectList" parameterType="java.util.Map" resultMap="resultList">
+	
+	select * from (
+				select ROWNUM RNUM, user_id, name, ticket_no, ticket_date, 
+				ticket_count, price, pay_type, state, user_name 
+				from (select * from v_festival_ticket_user 
+				order by ticket_date asc))
+				where RNUM between #{startRow} and #{endRow}
+	
+	</select>
+	
+	
+	<!-- 예매 검색 -->
+	<select id="searchList" parameterType="string" resultMap="resultList">
+	select * from v_festival_ticket_user 
+	<choose>
+	<when test="filter == 'all'">
+	where user_id like '%'||#{searchTF}||'%' 
+	or name like '%'||#{searchTF}||'%' 
+	or ticket_no like '%'||#{searchTF}||'%' 
+	or user_name like '%'||#{searchTF}||'%' 
+	or ticket_no like '%'||#{searchTF}||'%' 
+	or price like '%'||#{searchTF}||'%' 
+	or pay_type like '%'||#{searchTF}||'%' 
+	or state like '%'||#{searchTF}||'%' 
+	
+	</when>
+	<when test="filter == 'name'">
+	where user_name like '%'||#{searchTF}||'%'
+	</when>
+	<when test="filter == 'id'">
+	where user_id like '%'||#{searchTF}||'%'
+	</when>
+	<when test="filter == 'fname'">
+	where name like '%'||#{searchTF}||'%'
+	</when>
+	<when test="filter =='tno'">
+	where ticket_no like '%'||#{searchTF}||'%'
+	</when>
+	<when test="filter == 'price'">
+	where price like '%'||#{searchTF}||'%'
+	</when>
+	<when test="filter == 'ptype'">
+	where pay_type like '%'||#{searchTF}||'%'
+	</when>
+	<when test="filter == 'state'">
+	where state like '%'||#{searchTF}||'%'
+	</when>
+
+	</choose>
+	</select>
+	
+	<!-- 예매관리(검색)(페이징) -->
+	
+	<select id="tGetSelectListCount" resultType="_int" >
+	select count(*) from v_festival_ticket_user
+	<choose>
+	<when test="filter == 'all'">
+	where user_id like '%'||#{searchTF}||'%' 
+	or name like '%'||#{searchTF}||'%' 
+	or ticket_no like '%'||#{searchTF}||'%' 
+	or user_name like '%'||#{searchTF}||'%' 
+	or ticket_no like '%'||#{searchTF}||'%' 
+	or price like '%'||#{searchTF}||'%' 
+	or pay_type like '%'||#{searchTF}||'%' 
+	or state like '%'||#{searchTF}||'%' 
+	
+	</when>
+	<when test="filter == 'name'">
+	where user_name like '%'||#{searchTF}||'%'
+	</when>
+	<when test="filter == 'id'">
+	where user_id like '%'||#{searchTF}||'%'
+	</when>
+	<when test="filter == 'fname'">
+	where name like '%'||#{searchTF}||'%'
+	</when>
+	<when test="filter =='tno'">
+	where ticket_no like '%'||#{searchTF}||'%'
+	</when>
+	<when test="filter == 'price'">
+	where price like '%'||#{searchTF}||'%'
+	</when>
+	<when test="filter == 'ptype'">
+	where pay_type like '%'||#{searchTF}||'%'
+	</when>
+	<when test="filter == 'state'">
+	where state like '%'||#{searchTF}||'%'
+	</when>
+	
+	</choose>
+	</select>
+	
+	<!-- 예매 검색(리스트) -->
+	<select id="tSelectList" parameterType="java.util.Map" resultMap="resultList">
+	 select * from (
+	select ROWNUM RNUM, user_id, name, ticket_no, 
+    ticket_date, ticket_count, price, pay_type, state, user_name 
+    from (select * from v_festival_ticket_user
+	<choose>
+	<when test="filter == 'all'">
+	where user_id like '%'||#{searchTF}||'%' 
+	or name like '%'||#{searchTF}||'%' 
+	or ticket_no like '%'||#{searchTF}||'%' 
+	or user_name like '%'||#{searchTF}||'%' 
+	or ticket_no like '%'||#{searchTF}||'%' 
+	or price like '%'||#{searchTF}||'%' 
+	or pay_type like '%'||#{searchTF}||'%' 
+	or state like '%'||#{searchTF}||'%' ))
+	
+	
+	</when>
+	<when test="filter == 'name'">
+	where user_name like '%'||#{searchTF}||'%'))
+	</when>
+	<when test="filter == 'id'">
+	where user_id like '%'||#{searchTF}||'%'))
+	</when>
+	<when test="filter == 'fname'">
+	where name like '%'||#{searchTF}||'%'))
+	</when>
+	<when test="filter =='tno'">
+	where ticket_no like '%'||#{searchTF}||'%'))
+	</when>
+	<when test="filter == 'price'">
+	where price like '%'||#{searchTF}||'%'))
+	</when>
+	<when test="filter == 'ptype'">
+	where pay_type like '%'||#{searchTF}||'%'))
+	</when>
+	<when test="filter == 'state'">
+	where state like '%'||#{searchTF}||'%'))
+	</when>
+	
+	</choose>
+	where RNUM between  #{startRow} and #{endRow}
+	</select> 
+	
+	
+	<!-- 축제관리뷰(페이징) -->
+	<select id="festivalgetListCount" resultType="_int">
+	
+	select count(*) from tb_festival
+	
+	</select>
+	<!-- 축제관리뷰(리스트) -->
+	<select id="festivalSelectList" parameterType="AdminFestivalPage" resultMap="festivalList">
+	
+	select * from (
+        select ROWNUM RNUM, no, name, address, start_date, telephone, 
+        manage, read_count, recommend, ticket 
+        from (select * from tb_festival where delete_check= 'N'
+        order by no asc))
+        where RNUM between #{startRow} and #{endRow}
+	
+	</select>
+	
+	<!-- 축제검색페이징 -->
+	<select id="festivalgetSelectListCount" resultType="_int" parameterType="string">
+	select count(*) from tb_festival where delete_check = 'N' 
+	<choose>
+	<when test="filter == 'all'">
+	and name like '%'||#{searchTF}||'%' 
+	or address like '%'||#{searchTF}||'%' 
+	or name like '%'||#{searchTF}||'%' 
+	or manage like '%'||#{searchTF}||'%' 
+	or ticket like '%'||#{searchTF}||'%'
+	</when>
+	<when test="filter == 'location'">
+	and address like '%'||#{searchTF}||'%' 
+	</when>
+	<when test="filter == 'fname'">
+	and name like '%'||#{searchTF}||'%' 
+	</when>
+	<when test="filter == 'manage'">
+	and manage like '%'||#{searchTF}||'%' 
+	</when>
+	<when test="filter == 'ticket'">
+	and ticket like '%'||#{searchTF}||'%' 
+	</when>
+	</choose>
+	</select>
+	
+	<!-- 축제 검색(리스트) -->
+	<select id="fsearchList" parameterType="java.util.Map" resultMap="festivalList">
+	
+	select * from (select ROWNUM RNUM, no, name, address, start_date, telephone, 
+	manage, read_count, recommend, ticket from (select * from tb_festival 
+	
+	<choose>
+	<when test="filter == 'all'">
+
+	where (name like '%'||#{searchTF}||'%' and delete_check= 'N')
+	or (address like '%'||#{searchTF}||'%' and delete_check= 'N') 
+	or (name like '%'||#{searchTF}||'%' and delete_check= 'N') 
+	or (manage like '%'||#{searchTF}||'%' and delete_check= 'N') 
+	or (ticket like '%'||#{searchTF}||'%' and delete_check= 'N') order by no asc ))
+	
+	
+	</when>
+	<when test="filter == 'location'">
+	
+	where (address like '%'||#{searchTF}||'%' and delete_check= 'N') order by no asc))
+	
+	
+	</when>
+	<when test="filter == 'fname'">
+	
+	where (name like '%'||#{searchTF}||'%' and delete_check= 'N') order by no asc))
+	
+
+	</when>
+	<when test="filter == 'manage'">
+	
+	where (manage like '%'||#{searchTF}||'%' and delete_check= 'N') order by no asc))
+	
+	
+	</when>
+	<when test="filter == 'ticket'">
+	
+	where (ticket like '%'||#{searchTF}||'%' and delete_check= 'N') order by no asc))
+
+
+	</when>
+	</choose>
+	
+	where RNUM between #{startRow} and #{endRow}
+	
+	</select> 
+	
+	<!-- 축제 디테일 -->
+	<select id="festivalDetail" parameterType="_int" resultMap="festivalList">
+	select * from tb_festival where no = #{no}
+	</select>
+	
+	<!-- 축제 수정(축제) -->
+	<update id="updateFestival" parameterType="Festival" flushCache="true"
+		statementType="PREPARED">
+	update tb_festival set  
+	name = #{name}, address = #{address}, 
+	original_img_name = #{original_img_name}, 
+	new_img_name = #{new_img_name}, 
+	content = #{content}, start_date = #{start_date}, 
+	end_date = #{end_date}, theme = #{theme}, 
+	telephone = #{telephone}, manage = #{manage}, 
+	ticket = #{ticket}, tag= #{tag}, 
+	<choose>
+	<when test="file_name == null">
+		file_name = null,
+	</when>
+	<when test="file_name != null">
+		file_name = #{file_name},
+	</when>
+	</choose>
+	  where no = #{no}
+	</update>	
+
+	<!-- 축제 수정(티켓) -->
+	<update id="updateTicketOption" parameterType="TicketOption" flushCache="true"
+		statementType="PREPARED">
+	update tb_ticket_option set ticket_name = #{ticket_name}, 
+	ticket_price = #{ticket_price}, ticket_quantity = #{ticket_quantity}, 
+	company_name = #{company_name}, ceo_name = #{ceo_name}, 
+	phone = #{phone}, bank_name = #{bank_name}, 
+	account_holder_name = #{account_holder_name}, 
+	account_no = #{account_no}, 
+	registration_date = #{registration_date} 
+	where ticket_no = #{ticket_no}
+	</update>
+	
+	<!-- 축제삭제(축제) -->
+	<update id="afdelete" parameterType="_int" flushCache="true"
+		statementType="PREPARED">
+	update tb_festival set delete_check = 'Y'
+	where no = #{no}
+	</update>
+	
+	
+	
+	<!-- 회원리스트 -->
+	
+	<!-- <select id="adminMemberView" resultMap="memberList">
+	select * from tb_user
+	</select> -->
+	
+	<!-- 회원등록 -->
+	<insert id="insertMember" parameterType="Member" flushCache="true"
+		statementType="PREPARED" useGeneratedKeys="true">
+		insert into tb_user values (#{user_id}, #{user_pwd}, #{user_name}, #{user_birth}, 
+		#{user_address}, #{user_phone}, #{user_email}, #{user_gender})		
+	</insert>
+	
+	<!-- 회원리스트 페이징 -->
+	<select id="getListCount" resultType="_int">
+	
+	select count(*) from tb_user
+		
+	</select>
+	<!-- 회원리스트  -->
+	<select id="selectList" parameterType="java.util.Map" resultMap="memberList">
+	
+	select * from (
+        select ROWNUM RNUM, user_id, user_name, user_birth, 
+        user_address, user_phone, user_email, user_gender
+        from (select * from tb_user 
+        order by user_name asc))
+        where RNUM between #{startRow} and #{endRow}
+	
+	</select>
+	
+	
+	<!-- 회원관리 페이징-->
+	<select id="mGetListCount" resultType="_int">
+	
+	select count(*) from tb_user
+		
+	</select>
+	
+	<!-- 회원관리 리스트 -->
+	
+	<select id="mAllSelectList" parameterType="java.util.Map" resultMap="memberList">
+	
+	select * from (
+        select ROWNUM RNUM, user_id, user_name, user_birth, 
+        user_address, user_phone, user_email, user_gender 
+        from (select * from tb_user 
+        order by user_name asc))
+        where RNUM between #{startRow} and #{endRow}
+	
+	</select>
+	
+	
+	<!-- 회원검색페이징 -->
+	<select id="mGetSelectListCount" resultType="_int">
+	select count(*) from tb_user
+	<choose>
+	<when test="filter == 'all'">
+	where user_id like '%'||#{searchTF}||'%' 
+	or user_name like '%'||#{searchTF}||'%' 
+	or user_birth like '%'||#{searchTF}||'%' 
+	or user_address like '%'||#{searchTF}||'%' 
+	or user_phone like '%'||#{searchTF}||'%'
+	or user_email like '%'||#{searchTF}||'%'
+	or user_gender like '%'||#{searchTF}||'%'
+	
+	</when> 
+	<when test="filter == 'mid'">
+	where user_id like '%'||#{searchTF}||'%'
+	</when> 
+	<when test="filter == 'mname'">
+	where user_name like '%'||#{searchTF}||'%'
+	</when>
+	<when test="filter == 'maddress'">
+	where user_address like '%'||#{searchTF}||'%'
+	</when>
+	<when test="filter == 'mtelephone'">
+	where user_phone like '%'||#{searchTF}||'%'
+	</when>
+	<when test="filter == 'memail'">
+	where user_email like '%'||#{searchTF}||'%'
+	</when>
+	<when test="filter == 'mgender'">
+	where user_gender like '%'||#{searchTF}||'%'
+	</when>
+	
+	</choose>
+	</select>
+	
+	<!-- 회원 검색(리스트) -->
+	<select id="mSelectList" parameterType="java.util.Map" resultMap="memberList">
+	 select * from (
+	select ROWNUM RNUM, user_id, user_name, user_birth, 
+    user_phone, user_address, user_email, user_gender
+    from (select * from tb_user
+	<choose>
+	<when test="filter == 'all'">
+	where user_id like '%'||#{searchTF}||'%' 
+	or user_name like '%'||#{searchTF}||'%' 
+	or user_address like '%'||#{searchTF}||'%' 
+	or user_phone like '%'||#{searchTF}||'%' 
+	or user_email like '%'||#{searchTF}||'%' 
+	or user_gender like '%'||#{searchTF}||'%' ))
+	
+	
+	</when>
+	<when test="filter == 'mid'">
+	where user_id like '%'||#{searchTF}||'%'))
+	
+	</when>
+	<when test="filter == 'mname'">
+	where user_name like '%'||#{searchTF}||'%' ))
+	
+	</when>
+	<when test="filter == 'maddress'">
+	where user_address like '%'||#{searchTF}||'%')) 
+	
+	</when>
+	<when test="filter == 'mtelephone'">
+	where user_phone like '%'||#{searchTF}||'%' ))
+	
+	</when>
+	<when test="filter == 'memail'">
+	where user_email like '%'||#{searchTF}||'%' ))
+	
+	</when>
+	<when test="filter == 'mgender'">
+	where user_gender like '%'||#{searchTF}||'%')) 
+	
+	</when>
+	</choose>
+
+	where RNUM between  #{startRow} and #{endRow}
+	</select> 
+
+	<!-- 회원삭제 -->
+	<delete id="amdelete" parameterType="string" flushCache="true"
+		statementType="PREPARED">
+		
+		delete from tb_user where user_id = #{user_id}
+		
+	</delete>
+	
+	
+
+</mapper>
